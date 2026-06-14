@@ -1,0 +1,1195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>NLP — A Visual Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=DM+Serif+Display:ital@0;1&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:       #09090f;
+  --surface:  #111119;
+  --card:     #16161f;
+  --border:   rgba(160,90,255,0.15);
+  --violet:   #a05aff;
+  --cyan:     #00d4ff;
+  --mint:     #00ffb3;
+  --ember1:   #ff6a00;
+  --ember2:   #ffaa00;
+  --ember3:   #ffdd55;
+  --text:     #efecff;
+  --muted:    #7a7599;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  line-height: 1.7;
+  overflow-x: hidden;
+  min-height: 100vh;
+}
+
+/* CANVAS */
+#fire-canvas {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* NAV */
+nav {
+  position: fixed;
+  top: 0; left: 0; right: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 2.5rem;
+  background: rgba(9,9,15,0.85);
+  backdrop-filter: blur(14px);
+  border-bottom: 1px solid var(--border);
+}
+
+.nav-logo {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  letter-spacing: 0.2em;
+  color: var(--ember2);
+  text-transform: uppercase;
+}
+
+.nav-steps {
+  display: flex;
+  gap: 0.4rem;
+}
+
+.nav-step {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.08em;
+  padding: 0.35rem 0.9rem;
+  border-radius: 999px;
+  border: 1px solid var(--border);
+  color: var(--muted);
+  cursor: pointer;
+  background: transparent;
+  transition: all 0.25s;
+  text-transform: uppercase;
+}
+.nav-step:hover { border-color: var(--violet); color: var(--text); }
+.nav-step.active { background: var(--violet); border-color: var(--violet); color: #fff; }
+
+/* PAGES */
+.page {
+  display: none;
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+}
+.page.active { display: block; }
+
+/* WRAPPER */
+.wrap {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 7rem 2rem 6rem;
+}
+
+/* HERO SECTION */
+.hero {
+  min-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding-top: 2rem;
+}
+
+.eyebrow {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.28em;
+  text-transform: uppercase;
+  color: var(--ember2);
+  margin-bottom: 1.4rem;
+}
+
+h1 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(3rem, 7vw, 5.5rem);
+  line-height: 1.05;
+  font-weight: 400;
+}
+
+h1 .grad {
+  background: linear-gradient(90deg, var(--ember1), var(--ember2), var(--ember3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.hero-body {
+  margin-top: 1.6rem;
+  font-size: 1.05rem;
+  color: var(--muted);
+  max-width: 540px;
+}
+
+/* NEXT PAGE BUTTON */
+.next-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7rem;
+  margin-top: 3rem;
+  padding: 0.85rem 1.8rem;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--ember1), var(--ember2));
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 0.9rem;
+  letter-spacing: 0.04em;
+  border: none;
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 0 28px rgba(255,106,0,0.3);
+}
+.next-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 0 40px rgba(255,106,0,0.5);
+}
+.next-btn svg { transition: transform 0.2s; }
+.next-btn:hover svg { transform: translateX(4px); }
+
+.next-btn.violet {
+  background: linear-gradient(135deg, var(--violet), #6a2fff);
+  box-shadow: 0 0 28px rgba(160,90,255,0.3);
+}
+.next-btn.violet:hover { box-shadow: 0 0 40px rgba(160,90,255,0.5); }
+
+/* DIVIDER */
+.divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--border), transparent);
+  margin: 3rem 0;
+}
+
+/* SECTION BLOCKS */
+.block {
+  margin-bottom: 4rem;
+}
+
+.block-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  letter-spacing: 0.25em;
+  text-transform: uppercase;
+  color: var(--ember2);
+  margin-bottom: 0.5rem;
+}
+
+h2 {
+  font-family: 'DM Serif Display', serif;
+  font-size: clamp(1.7rem, 3vw, 2.4rem);
+  font-weight: 400;
+  line-height: 1.2;
+  margin-bottom: 0.9rem;
+}
+
+h2 .v { color: var(--violet); }
+h2 .c { color: var(--cyan); }
+h2 .o { color: var(--ember2); }
+h2 .m { color: var(--mint); }
+
+h3 {
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  color: var(--text);
+  margin: 1.6rem 0 0.4rem;
+  text-transform: uppercase;
+}
+
+p {
+  color: rgba(239,236,255,0.72);
+  font-size: 0.97rem;
+  margin-bottom: 0.8rem;
+}
+
+strong { color: var(--text); font-weight: 700; }
+
+/* EXAMPLE BOXES */
+.example {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.3rem 1.5rem;
+  margin: 1.4rem 0;
+  font-size: 0.88rem;
+}
+
+.example-label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--ember2);
+  margin-bottom: 0.7rem;
+}
+
+.example p { font-size: 0.88rem; margin-bottom: 0.4rem; }
+
+/* CODE */
+.code {
+  background: #0c0c18;
+  border: 1px solid rgba(0,212,255,0.15);
+  border-radius: 10px;
+  padding: 1.1rem 1.3rem;
+  margin: 1.2rem 0;
+  overflow-x: auto;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.78rem;
+  line-height: 1.8;
+  color: #c5bfff;
+}
+.kw  { color: var(--violet); }
+.fn  { color: var(--cyan); }
+.str { color: var(--mint); }
+.cm  { color: #4a4468; font-style: italic; }
+.num { color: var(--ember2); }
+
+/* CARD GRID */
+.cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 0.9rem;
+  margin: 1.4rem 0;
+}
+
+.card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  padding: 1.2rem;
+  transition: border-color 0.25s, transform 0.25s;
+}
+.card:hover { border-color: rgba(160,90,255,0.4); transform: translateY(-2px); }
+
+.card-title {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text);
+  margin-bottom: 0.35rem;
+}
+.card p { font-size: 0.8rem; color: var(--muted); margin: 0; }
+
+/* VISUAL DIAGRAM */
+.diagram {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.6rem;
+  margin: 1.4rem 0;
+  text-align: center;
+}
+
+.flow {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0;
+}
+
+.flow-step {
+  background: rgba(160,90,255,0.1);
+  border: 1px solid rgba(160,90,255,0.3);
+  border-radius: 8px;
+  padding: 0.5rem 0.9rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  color: var(--text);
+  white-space: nowrap;
+}
+
+.flow-arrow {
+  color: var(--ember2);
+  font-size: 1rem;
+  padding: 0 0.35rem;
+}
+
+/* HIGHLIGHT */
+.hl {
+  border-radius: 12px;
+  padding: 1.2rem 1.4rem;
+  margin: 1.4rem 0;
+  font-size: 0.9rem;
+}
+.hl-orange { background: rgba(255,106,0,0.08); border: 1px solid rgba(255,170,0,0.25); }
+.hl-violet { background: rgba(160,90,255,0.08); border: 1px solid rgba(160,90,255,0.25); }
+.hl-mint   { background: rgba(0,255,179,0.06);  border: 1px solid rgba(0,255,179,0.2); }
+
+/* TABLE */
+.tbl {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.85rem;
+  margin: 1.4rem 0;
+}
+.tbl th {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.63rem;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 0.6rem 0.9rem;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+.tbl td {
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid rgba(255,255,255,0.04);
+  color: rgba(239,236,255,0.72);
+}
+.tbl tr:hover td { background: rgba(160,90,255,0.04); }
+
+/* IMAGE PLACEHOLDER / VISUAL */
+.visual {
+  width: 100%;
+  border-radius: 14px;
+  overflow: hidden;
+  margin: 1.4rem 0;
+  border: 1px solid var(--border);
+  background: var(--card);
+}
+
+.visual-inner {
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+}
+
+/* ATTENTION VISUALIZER */
+.attention-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  width: 100%;
+  max-width: 460px;
+}
+
+.attn-word {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  text-align: center;
+  padding: 0.4rem 0.2rem;
+  border-radius: 6px;
+  color: var(--text);
+  transition: all 0.3s;
+  cursor: default;
+  border: 1px solid transparent;
+}
+
+.attn-caption {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.65rem;
+  color: var(--muted);
+  letter-spacing: 0.1em;
+  margin-top: 0.5rem;
+}
+
+/* SENTIMENT DEMO */
+.demo-box {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 14px;
+  padding: 1.4rem;
+  margin: 1.4rem 0;
+}
+.demo-input {
+  width: 100%;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 0.7rem 1rem;
+  color: var(--text);
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 0.9rem;
+  outline: none;
+  margin-bottom: 0.8rem;
+  transition: border-color 0.2s;
+}
+.demo-input:focus { border-color: var(--violet); }
+
+.demo-btn {
+  padding: 0.6rem 1.4rem;
+  background: var(--violet);
+  border: none;
+  border-radius: 8px;
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: opacity 0.2s;
+}
+.demo-btn:hover { opacity: 0.85; }
+
+.demo-result {
+  margin-top: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.8rem;
+  min-height: 1.5rem;
+  color: var(--mint);
+  letter-spacing: 0.05em;
+}
+
+/* BERT TOKEN VISUAL */
+.token-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0.8rem 0;
+}
+.token {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.72rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 6px;
+  border: 1px solid;
+}
+.token-cls   { border-color: var(--ember2); color: var(--ember2); background: rgba(255,170,0,0.08); }
+.token-sep   { border-color: var(--ember2); color: var(--ember2); background: rgba(255,170,0,0.08); }
+.token-word  { border-color: var(--border); color: var(--text); background: var(--card); }
+.token-sub   { border-color: rgba(0,212,255,0.3); color: var(--cyan); background: rgba(0,212,255,0.06); }
+.token-pad   { border-color: rgba(255,255,255,0.08); color: var(--muted); background: transparent; }
+
+/* FADE IN */
+.fade-in {
+  opacity: 0;
+  transform: translateY(24px);
+  transition: opacity 0.65s ease, transform 0.65s ease;
+}
+.fade-in.visible { opacity: 1; transform: translateY(0); }
+
+/* PROGRESS BAR */
+.progress-bar {
+  position: fixed;
+  top: 0; left: 0;
+  height: 2px;
+  background: linear-gradient(90deg, var(--ember1), var(--ember2), var(--violet));
+  z-index: 200;
+  transition: width 0.1s;
+}
+
+/* PAGE TRANSITION */
+.page { animation: pagein 0.5s ease; }
+@keyframes pagein {
+  from { opacity: 0; transform: translateY(16px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* SCROLLBAR */
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-track { background: var(--bg); }
+::-webkit-scrollbar-thumb { background: rgba(160,90,255,0.35); border-radius: 99px; }
+
+@media (max-width: 600px) {
+  nav { padding: 0.8rem 1rem; }
+  .nav-logo { display: none; }
+  .wrap { padding: 6rem 1.2rem 4rem; }
+  .flow { flex-direction: column; }
+  .flow-arrow { transform: rotate(90deg); }
+}
+</style>
+</head>
+<body>
+
+<div class="progress-bar" id="progress"></div>
+<canvas id="fire-canvas"></canvas>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-logo">NLP — A Visual Guide</div>
+  <div class="nav-steps">
+    <button class="nav-step active" onclick="goTo(0)">NLP & History</button>
+    <button class="nav-step" onclick="goTo(1)">Classification</button>
+    <button class="nav-step" onclick="goTo(2)">Encoders</button>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE 1 — NLP & HISTORY
+═══════════════════════════════════════════════════════ -->
+<div class="page active" id="page-0">
+<div class="wrap">
+
+  <div class="hero fade-in">
+    <div class="eyebrow">Natural Language Processing</div>
+    <h1>Teaching machines<br/>to read <span class="grad">language</span></h1>
+    <p class="hero-body">
+      NLP is the field that gives computers the ability to understand, interpret, and work with human language. This is the story of how we got from counting words to machines that read like humans.
+    </p>
+    <button class="next-btn" onclick="goTo(1)">
+      Text Classification
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- WHY NLP -->
+  <div class="block fade-in">
+    <div class="block-label">The Problem</div>
+    <h2>Why is language <span class="v">hard</span> for machines?</h2>
+    <p>Computers understand numbers. Language is messy, ambiguous, and context-dependent. The same word means different things in different sentences. Sarcasm, idioms, synonyms — none of it maps neatly to math.</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Ambiguity</div>
+        <p>"I saw her duck" — did she duck, or was there a duck?</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Context</div>
+        <p>"Bank" means something completely different near "river" vs "money."</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Sarcasm</div>
+        <p>"Oh great, another Monday" is negative, but the words sound positive.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Scale</div>
+        <p>Billions of documents exist. No human can label them all by hand.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- HISTORY TIMELINE -->
+  <div class="block fade-in">
+    <div class="block-label">The History</div>
+    <h2>How we got <span class="o">here</span></h2>
+    <p>NLP did not arrive fully formed. It evolved over decades, each era solving the failures of the one before it.</p>
+
+    <div class="example">
+      <div class="example-label">1950s — Rule-Based Systems</div>
+      <p>Early NLP was hand-coded rules. Linguists wrote thousands of if-then statements. "If the sentence contains 'not', flip the sentiment." Brittle, expensive, and impossible to scale.</p>
+    </div>
+
+    <div class="example">
+      <div class="example-label">1990s — Statistical NLP</div>
+      <p>Instead of rules, let the machine learn patterns from large text corpora. Count word frequencies, build probability models. Better, but still treating words as isolated units with no meaning.</p>
+    </div>
+
+    <div class="example">
+      <div class="example-label">2013 — Word Embeddings</div>
+      <p>Word2Vec arrived. Words became vectors in a mathematical space. Similar words cluster together. "King minus man plus woman equals queen." Language finally had geometry.</p>
+    </div>
+
+    <div class="example">
+      <div class="example-label">2017 — Transformers</div>
+      <p>The paper "Attention Is All You Need" changed everything. Instead of reading left to right, models could now look at all words simultaneously and weigh their relationships. Context became computable.</p>
+    </div>
+
+    <div class="example">
+      <div class="example-label">2018 — BERT & Pretraining</div>
+      <p>Google trained a Transformer on the entire Wikipedia. Instead of building a model per task, you pretrain once and adapt to anything. The modern NLP era begins.</p>
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- WHAT NLP IS USED FOR -->
+  <div class="block fade-in">
+    <div class="block-label">Real World</div>
+    <h2>Where NLP lives <span class="c">today</span></h2>
+    <p>NLP is not academic. It is running inside products you use every day.</p>
+
+    <table class="tbl">
+      <thead>
+        <tr><th>Application</th><th>What NLP does</th><th>Example</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Search Engines</strong></td><td>Understand query intent</td><td>Google knowing "jaguar" means the car, not the animal</td></tr>
+        <tr><td><strong>Email</strong></td><td>Classify incoming messages</td><td>Gmail spam filter, priority inbox</td></tr>
+        <tr><td><strong>Voice Assistants</strong></td><td>Parse spoken commands</td><td>Siri, Alexa, Google Assistant</td></tr>
+        <tr><td><strong>Social Media</strong></td><td>Detect harmful content</td><td>Twitter/X moderation at scale</td></tr>
+        <tr><td><strong>Customer Support</strong></td><td>Route and respond to tickets</td><td>Chatbots classifying intent</td></tr>
+        <tr><td><strong>Healthcare</strong></td><td>Extract info from records</td><td>Summarizing clinical notes</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <div class="block fade-in" style="text-align:center; padding-bottom: 2rem;">
+    <p style="color:var(--muted); margin-bottom: 1.4rem;">Ready to go deeper? The next section covers how machines actually classify text.</p>
+    <button class="next-btn" onclick="goTo(1)">
+      Text Classification
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE 2 — TEXT CLASSIFICATION
+═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-1">
+<div class="wrap">
+
+  <div class="hero fade-in">
+    <div class="eyebrow">Chapter Two</div>
+    <h1>Text <span class="grad">Classification</span></h1>
+    <p class="hero-body">
+      Given a piece of text, assign it a label. That is the entire task. The challenge is teaching a machine what patterns in language correspond to which categories.
+    </p>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- WHAT IS IT -->
+  <div class="block fade-in">
+    <div class="block-label">The Task</div>
+    <h2>What classification <span class="v">actually is</span></h2>
+    <p>You feed in text. The model outputs a category. Behind the scenes, the model converts the text to numbers, runs it through a learned function, and returns the most likely label.</p>
+
+    <div class="diagram">
+      <div class="flow">
+        <div class="flow-step">"The film was awful"</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Model</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Negative</div>
+      </div>
+    </div>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Sentiment Analysis</div>
+        <p>Positive / Negative / Neutral. Used in product reviews, social listening, brand monitoring.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Topic Labeling</div>
+        <p>Sports, Finance, Health, Tech. Used in news routing and content recommendation.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Intent Detection</div>
+        <p>"Cancel my order" vs "Track my package." Core to every chatbot and voice assistant.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Content Moderation</div>
+        <p>Flagging toxic, harmful, or off-policy content on platforms at scale.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- BAG OF WORDS -->
+  <div class="block fade-in">
+    <div class="block-label">Approach 1</div>
+    <h2>Bag of <span class="o">Words</span></h2>
+    <p>The oldest approach. Take a sentence, throw away the order, and count how many times each word appears. That count vector becomes the input to a classifier.</p>
+
+    <div class="example">
+      <div class="example-label">Example</div>
+      <p>"The cat sat on the mat"</p>
+      <p style="color:var(--muted); margin-top:0.4rem;">becomes → <span style="color:var(--cyan); font-family:'JetBrains Mono',monospace; font-size:0.82rem;">{ the:2, cat:1, sat:1, on:1, mat:1 }</span></p>
+    </div>
+
+    <div class="hl hl-orange">
+      <strong>The problem.</strong> "The dog bit the man" and "The man bit the dog" produce the exact same vector. Word order — which carries meaning — is completely discarded.
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- TF-IDF -->
+  <div class="block fade-in">
+    <div class="block-label">Approach 2</div>
+    <h2>TF-IDF — <span class="c">Smarter Counting</span></h2>
+    <p>TF-IDF improves on BoW by asking: is this word actually useful, or does it appear in every document? Common words like "the" and "is" are downweighted. Rare, meaningful words like "bankruptcy" or "touchdown" get upweighted.</p>
+
+    <div class="example">
+      <div class="example-label">Intuition</div>
+      <p>"The" appears in 10,000 documents — low weight. "Bankruptcy" appears in 12 documents — high weight. The rare word tells you more about what the document is actually about.</p>
+    </div>
+
+    <div class="hl hl-orange">
+      <strong>Still the same core problem.</strong> "Bank" in a finance article and "bank" near "river" get the same score. Context is still invisible.
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- WORD EMBEDDINGS -->
+  <div class="block fade-in">
+    <div class="block-label">Approach 3</div>
+    <h2>Word <span class="v">Embeddings</span></h2>
+    <p>Instead of counts, represent each word as a point in a mathematical space — a list of 300 numbers called a vector. Words with similar meanings cluster near each other in this space.</p>
+
+    <div class="visual">
+      <div class="visual-inner">
+        <div style="font-family:'JetBrains Mono',monospace; font-size:0.75rem; color:var(--muted); letter-spacing:0.1em; text-transform:uppercase; margin-bottom:0.5rem;">Word Similarity in Vector Space</div>
+        <div style="display:flex; flex-wrap:wrap; gap:0.6rem; justify-content:center;">
+          <span style="background:rgba(255,106,0,0.15);border:1px solid rgba(255,106,0,0.4);border-radius:8px;padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--ember2);">king</span>
+          <span style="background:rgba(255,106,0,0.15);border:1px solid rgba(255,106,0,0.4);border-radius:8px;padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--ember2);">queen</span>
+          <span style="background:rgba(255,106,0,0.12);border:1px solid rgba(255,106,0,0.3);border-radius:8px;padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--ember1);">prince</span>
+          <span style="background:rgba(160,90,255,0.12);border:1px solid rgba(160,90,255,0.3);border-radius:8px;padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--violet);">dog</span>
+          <span style="background:rgba(160,90,255,0.12);border:1px solid rgba(160,90,255,0.3);border-radius:8px;padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--violet);">cat</span>
+          <span style="background:rgba(160,90,255,0.12);border:1px solid rgba(160,90,255,0.3);border-radius:8px;padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--violet);">puppy</span>
+          <span style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);border-radius:8px;padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--cyan);">happy</span>
+          <span style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);border-radius:8px;padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--cyan);">joyful</span>
+          <span style="background:rgba(0,212,255,0.1);border:1px solid rgba(0,212,255,0.25);border-radius:8px;padding:0.4rem 0.8rem;font-family:'JetBrains Mono',monospace;font-size:0.75rem;color:var(--cyan);">glad</span>
+        </div>
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.65rem;color:var(--muted);margin-top:0.8rem;letter-spacing:0.08em;">same color = similar meaning = close in vector space</div>
+      </div>
+    </div>
+
+    <div class="example">
+      <div class="example-label">The Famous Equation</div>
+      <p style="font-family:'JetBrains Mono',monospace;font-size:0.88rem;color:var(--text);">king &minus; man + woman &asymp; queen</p>
+      <p style="margin-top:0.5rem;">The embedding space captures relationships between concepts. You can do arithmetic on meaning.</p>
+    </div>
+
+    <div class="hl hl-violet">
+      <strong>Still one problem left.</strong> These are static embeddings. Every word gets one fixed vector forever. "Bank" always sits in the same spot — regardless of whether you mean a financial institution or a riverbank.
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- TRY IT -->
+  <div class="block fade-in">
+    <div class="block-label">Interactive</div>
+    <h2>Sentiment <span class="m">Classifier</span></h2>
+    <p>Type any sentence and see how a simple keyword-based classifier assigns sentiment — this is the BoW era in action.</p>
+
+    <div class="demo-box">
+      <input class="demo-input" id="sent-input" type="text" placeholder="Type a sentence...  e.g. The movie was absolutely terrible"/>
+      <button class="demo-btn" onclick="classifySentiment()">Classify</button>
+      <div class="demo-result" id="sent-result"></div>
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- EVALUATION -->
+  <div class="block fade-in">
+    <div class="block-label">Measuring Performance</div>
+    <h2>Is your model <span class="o">actually good?</span></h2>
+    <p>Accuracy alone is misleading. If 95% of your emails are not spam, a model that always says "not spam" scores 95% accuracy — while being completely useless.</p>
+
+    <table class="tbl">
+      <thead>
+        <tr><th>Metric</th><th>What it measures</th><th>Use when</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Accuracy</strong></td><td>Overall correct predictions</td><td>Classes are balanced</td></tr>
+        <tr><td><strong>Precision</strong></td><td>Of all positive predictions, how many were right</td><td>False alarms are costly</td></tr>
+        <tr><td><strong>Recall</strong></td><td>Of all actual positives, how many did you catch</td><td>Missing cases is dangerous</td></tr>
+        <tr><td><strong>F1 Score</strong></td><td>Balance of precision and recall</td><td>Imbalanced datasets — default choice</td></tr>
+      </tbody>
+    </table>
+
+    <div class="hl hl-mint">
+      <strong>Default rule.</strong> When in doubt, optimize for F1. It gives equal weight to false positives and false negatives, and does not reward models that simply predict the majority class.
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <div class="block fade-in" style="text-align:center; padding-bottom: 2rem;">
+    <p style="color:var(--muted); margin-bottom: 1.4rem;">Classification is solved. Now — how do modern models actually understand context? That is where pretrained encoders come in.</p>
+    <button class="next-btn violet" onclick="goTo(2)">
+      Pretrained Encoders
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </button>
+  </div>
+
+</div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     PAGE 3 — PRETRAINED ENCODERS
+═══════════════════════════════════════════════════════ -->
+<div class="page" id="page-2">
+<div class="wrap">
+
+  <div class="hero fade-in">
+    <div class="eyebrow">Chapter Three</div>
+    <h1>Pretrained <span class="grad">Encoders</span></h1>
+    <p class="hero-body">
+      Large neural networks trained on massive text corpora. They produce contextual representations — the same word gets a different vector depending on its surrounding context. This is the state of the art.
+    </p>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- TRANSFORMERS -->
+  <div class="block fade-in">
+    <div class="block-label">The Architecture</div>
+    <h2>The <span class="o">Transformer</span></h2>
+    <p>Introduced in 2017. The key innovation is self-attention: instead of reading words one by one, every word looks at every other word simultaneously and learns which ones to pay attention to.</p>
+
+    <div class="visual">
+      <div class="visual-inner">
+        <div style="font-family:'JetBrains Mono',monospace;font-size:0.7rem;color:var(--muted);letter-spacing:0.12em;text-transform:uppercase;margin-bottom:1rem;">Self-Attention — What does "it" refer to?</div>
+        <div class="attention-grid" id="attn-grid"></div>
+        <div class="attn-caption">hover the words to see attention weights</div>
+      </div>
+    </div>
+
+    <div class="hl hl-orange">
+      <strong>Why this matters.</strong> "Bank" near "cash" and "money" gets a different representation than "bank" near "river" and "fish." Context is finally computable.
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- BERT -->
+  <div class="block fade-in">
+    <div class="block-label">The Model</div>
+    <h2>BERT — <span class="v">Pretrained on Everything</span></h2>
+    <p>Google trained a Transformer on all of Wikipedia and thousands of books using two self-supervised tasks — no human labels needed. The result is a model with deep general language understanding that can be adapted to almost any task.</p>
+
+    <div class="cards">
+      <div class="card">
+        <div class="card-title">Masked Language Modeling</div>
+        <p>15% of words are hidden. The model learns to predict them — forcing genuine bidirectional understanding.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Next Sentence Prediction</div>
+        <p>Given two sentences, predict whether B follows A. Teaches discourse and paragraph-level understanding.</p>
+      </div>
+    </div>
+
+    <h3>The [CLS] Token</h3>
+    <p>BERT prepends a special token to every input. After passing through all transformer layers, that token's output vector summarizes the entire sequence — and is what you use for classification.</p>
+
+    <div class="diagram">
+      <div class="flow">
+        <div class="flow-step">[CLS] The film was great [SEP]</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">12 Transformer Layers</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">[CLS] vector</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Linear Layer</div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-step">Positive</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- TOKENIZATION -->
+  <div class="block fade-in">
+    <div class="block-label">Text to Numbers</div>
+    <h2>How <span class="c">Tokenization</span> Works</h2>
+    <p>Before BERT can process text, words must become numbers. BERT uses subword tokenization — it splits unknown words into known fragments, so it can handle any word it has never seen before.</p>
+
+    <div class="example">
+      <div class="example-label">Subword Splitting</div>
+      <p>"unaffordable" → <span style="font-family:'JetBrains Mono',monospace;font-size:0.82rem;color:var(--cyan);">un + ##afford + ##able</span></p>
+      <p style="margin-top:0.4rem;">The ## prefix means "this chunk continues from the previous token."</p>
+    </div>
+
+    <h3>Special Tokens</h3>
+    <div class="token-row">
+      <span class="token token-cls">[CLS]</span>
+      <span class="token token-word">The</span>
+      <span class="token token-word">film</span>
+      <span class="token token-word">was</span>
+      <span class="token token-sub">un</span>
+      <span class="token token-sub">##for</span>
+      <span class="token token-sub">##get</span>
+      <span class="token token-sub">##table</span>
+      <span class="token token-sep">[SEP]</span>
+      <span class="token token-pad">[PAD]</span>
+      <span class="token token-pad">[PAD]</span>
+    </div>
+
+    <div class="hl hl-violet">
+      <strong>The attention mask.</strong> Padding tokens are added to make batches the same length. The attention mask tells BERT which tokens are real (1) and which are padding (0). Forgetting this silently degrades your results.
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- FINE-TUNING -->
+  <div class="block fade-in">
+    <div class="block-label">Adapting BERT</div>
+    <h2>Fine-<span class="m">Tuning</span></h2>
+    <p>BERT understands language generally. Fine-tuning adapts it to your specific task using your labeled data. Think of it as BERT's first week on the job — a short training period on your domain.</p>
+
+    <div class="example">
+      <div class="example-label">What Fine-Tuning Looks Like</div>
+      <p>"This product broke immediately" → <strong>Negative</strong></p>
+      <p>"Absolutely love it, 5 stars" → <strong>Positive</strong></p>
+      <p>"Delivery was late but product ok" → <strong>Neutral</strong></p>
+      <p style="margin-top:0.6rem;color:var(--muted);">Feed these to BERT for 2–5 training epochs. It learns to map your text to your categories using everything it already knows about language.</p>
+    </div>
+
+    <table class="tbl">
+      <thead>
+        <tr><th>Method</th><th>What updates</th><th>Best for</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>Full Fine-Tuning</strong></td><td>All 110M weights</td><td>Best accuracy, needs GPU</td></tr>
+        <tr><td><strong>Frozen Encoder</strong></td><td>Only the classification head</td><td>Fast baseline, small data</td></tr>
+        <tr><td><strong>LoRA</strong></td><td>~1% of weights via adapters</td><td>Near full quality, fraction of cost</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- BERT VARIANTS -->
+  <div class="block fade-in">
+    <div class="block-label">Choosing a Model</div>
+    <h2>The BERT <span class="o">Family</span></h2>
+    <p>You do not always need the full BERT. There is a variant tuned for almost every constraint.</p>
+
+    <table class="tbl">
+      <thead>
+        <tr><th>Model</th><th>Key difference</th><th>Best for</th></tr>
+      </thead>
+      <tbody>
+        <tr><td><strong>RoBERTa</strong></td><td>Trained longer, no NSP, more data</td><td>Best accuracy on general English</td></tr>
+        <tr><td><strong>DistilBERT</strong></td><td>40% smaller, 60% faster</td><td>Low latency, edge deployment</td></tr>
+        <tr><td><strong>DeBERTa</strong></td><td>Disentangled attention</td><td>Highest possible accuracy</td></tr>
+        <tr><td><strong>BioBERT</strong></td><td>Pretrained on PubMed</td><td>Medical and clinical text</td></tr>
+        <tr><td><strong>FinBERT</strong></td><td>Pretrained on financial news</td><td>Finance domain classification</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- ZERO SHOT -->
+  <div class="block fade-in">
+    <div class="block-label">Advanced</div>
+    <h2>Zero-Shot — <span class="v">No Labels Needed</span></h2>
+    <p>Modern models can classify text into categories they have never been trained on. You describe the categories in plain English. The model uses its language understanding to reason about whether the text matches.</p>
+
+    <div class="example">
+      <div class="example-label">How It Works</div>
+      <p>Text: "Interest rates are rising sharply"</p>
+      <p style="margin-top:0.5rem;">The model asks: "Is this text about <strong>finance</strong>?" → Yes, 94%</p>
+      <p>The model asks: "Is this text about <strong>sports</strong>?" → No, 3%</p>
+      <p>The model asks: "Is this text about <strong>technology</strong>?" → No, 3%</p>
+    </div>
+
+    <div class="hl hl-violet">
+      <strong>Why this is powerful.</strong> You can spin up a classifier for a new task in seconds — no data collection, no training, no labeling. Just describe what you want in plain English.
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <!-- SUMMARY -->
+  <div class="block fade-in">
+    <div class="block-label">The Full Picture</div>
+    <h2>The <span class="m">Journey</span></h2>
+    <p>Every step in NLP history solved the biggest weakness of the step before it.</p>
+
+    <div class="example">
+      <div class="example-label">Evolution</div>
+      <p><strong style="color:var(--ember2);">Bag of Words</strong> — words are counts. Order is lost.</p>
+      <p><strong style="color:var(--ember2);">TF-IDF</strong> — smarter counts. Rare words matter more.</p>
+      <p><strong style="color:var(--violet);">Word2Vec</strong> — words have meaning. Similar words cluster together.</p>
+      <p><strong style="color:var(--violet);">Transformers</strong> — words have context. Meaning depends on surroundings.</p>
+      <p><strong style="color:var(--cyan);">BERT</strong> — pretrained on everything. Adapt to any task cheaply.</p>
+      <p><strong style="color:var(--mint);">Zero-Shot / LoRA</strong> — efficient, flexible, no labels required.</p>
+    </div>
+  </div>
+
+  <div class="divider fade-in"></div>
+
+  <div class="block fade-in" style="text-align:center; padding-bottom: 2rem;">
+    <p style="color:var(--muted); margin-bottom: 1.4rem;">That is the full arc of modern NLP. Go back to review any section.</p>
+    <button class="next-btn" onclick="goTo(0)" style="background:linear-gradient(135deg,#333,#444);box-shadow:none;">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M19 12H5M12 19l-7-7 7-7"/></svg>
+      Back to Start
+    </button>
+  </div>
+
+</div>
+</div>
+
+<script>
+// ── FIRE SPARKS ─────────────────────────────────────────────────
+const canvas = document.getElementById('fire-canvas');
+const ctx = canvas.getContext('2d');
+let W, H;
+function resize() { W = canvas.width = innerWidth; H = canvas.height = innerHeight; }
+resize(); addEventListener('resize', resize);
+
+const COLS = [[255,106,0],[255,157,0],[255,220,50],[255,70,20],[160,90,255],[0,212,255]];
+class Spark {
+  constructor() { this.reset(true); }
+  reset(init=false) {
+    this.x = Math.random()*W;
+    this.y = init ? Math.random()*H : H+8;
+    this.vy = -(0.35+Math.random()*1.1);
+    this.vx = (Math.random()-0.5)*0.55;
+    this.r  = 1+Math.random()*2.2;
+    this.life=0; this.max=90+Math.random()*150;
+    const r=Math.random();
+    this.col = r<0.03?COLS[5]:r<0.08?COLS[4]:COLS[Math.floor(Math.random()*4)];
+  }
+  update() {
+    this.x += this.vx+Math.sin(this.life*0.11)*0.22;
+    this.y += this.vy; this.vy-=0.007; this.life++;
+    if(this.life>this.max||this.y<-10) this.reset();
+  }
+  draw() {
+    const t=this.life/this.max;
+    const a=t<0.2?t/0.2:1-(t-0.2)/0.8;
+    const [r,g,b]=this.col;
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.r*(1-t*0.5),0,Math.PI*2);
+    ctx.fillStyle=`rgba(${r},${g},${b},${a*0.6})`; ctx.fill();
+    const grd=ctx.createRadialGradient(this.x,this.y,0,this.x,this.y,this.r*4);
+    grd.addColorStop(0,`rgba(${r},${g},${b},${a*0.15})`);
+    grd.addColorStop(1,`rgba(${r},${g},${b},0)`);
+    ctx.beginPath(); ctx.arc(this.x,this.y,this.r*4,0,Math.PI*2);
+    ctx.fillStyle=grd; ctx.fill();
+  }
+}
+const sparks = Array.from({length:100},()=>new Spark());
+(function loop(){
+  ctx.clearRect(0,0,W,H);
+  sparks.forEach(s=>{s.update();s.draw();});
+  requestAnimationFrame(loop);
+})();
+
+// ── PAGE NAVIGATION ─────────────────────────────────────────────
+let current = 0;
+function goTo(n) {
+  document.getElementById('page-'+current).classList.remove('active');
+  document.querySelectorAll('.nav-step')[current].classList.remove('active');
+  current = n;
+  const pg = document.getElementById('page-'+n);
+  pg.classList.add('active');
+  document.querySelectorAll('.nav-step')[n].classList.add('active');
+  window.scrollTo({top:0, behavior:'instant'});
+  // re-observe fade-ins on new page
+  pg.querySelectorAll('.fade-in').forEach(el=>{
+    el.classList.remove('visible');
+    setTimeout(()=>io.observe(el),50);
+  });
+  updateProgress();
+}
+
+// ── SCROLL FADE ─────────────────────────────────────────────────
+const io = new IntersectionObserver(entries=>{
+  entries.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add('visible'); io.unobserve(e.target); }});
+},{threshold:0.1});
+document.querySelectorAll('.fade-in').forEach(el=>io.observe(el));
+
+// ── PROGRESS BAR ────────────────────────────────────────────────
+function updateProgress() {
+  const bar = document.getElementById('progress');
+  const pct = (current/(2))*100;
+  bar.style.width = pct+'%';
+}
+window.addEventListener('scroll',()=>{
+  const el = document.getElementById('page-'+current);
+  const scrolled = window.scrollY;
+  const total = el.scrollHeight - innerHeight;
+  const base = (current/2)*100;
+  const seg = (1/2)*100;
+  const frac = total>0 ? (scrolled/total)*seg : 0;
+  document.getElementById('progress').style.width = (base+frac)+'%';
+});
+
+// ── SENTIMENT DEMO ───────────────────────────────────────────────
+const posWords = ['great','brilliant','love','amazing','excellent','wonderful','fantastic','good','best','perfect','happy','glad','superb','awesome'];
+const negWords = ['terrible','awful','hate','horrible','worst','bad','poor','disappointing','useless','broken','slow','ugly','boring','dreadful'];
+
+function classifySentiment() {
+  const input = document.getElementById('sent-input').value.toLowerCase();
+  const result = document.getElementById('sent-result');
+  if(!input.trim()) { result.textContent = 'Type something first.'; result.style.color='var(--muted)'; return; }
+  const words = input.split(/\W+/);
+  let score = 0;
+  words.forEach(w=>{ if(posWords.includes(w)) score++; if(negWords.includes(w)) score--; });
+  if(score>0)      { result.textContent = 'Prediction: POSITIVE  (score: +'+score+')'; result.style.color='var(--mint)'; }
+  else if(score<0) { result.textContent = 'Prediction: NEGATIVE  (score: '+score+')'; result.style.color='#ff7070'; }
+  else             { result.textContent = 'Prediction: NEUTRAL  (score: 0)'; result.style.color='var(--ember2)'; }
+}
+document.getElementById('sent-input').addEventListener('keydown',e=>{ if(e.key==='Enter') classifySentiment(); });
+
+// ── ATTENTION VISUALIZER ─────────────────────────────────────────
+const sentence = ['The','cat','sat','on','the','mat','because','it','was','tired','[CLS]','[SEP]','[PAD]'];
+const display  = ['The','cat','sat','on','the','mat','because','it','was','tired'];
+
+// attention weights: which words does each word attend to most?
+const attnWeights = {
+  'it':   {'cat':0.85,'The':0.1,'sat':0.05},
+  'tired':{'cat':0.6,'it':0.3,'was':0.1},
+  'sat':  {'cat':0.7,'mat':0.2,'on':0.1},
+};
+
+function buildAttnGrid() {
+  const grid = document.getElementById('attn-grid');
+  if(!grid) return;
+  grid.style.gridTemplateColumns = `repeat(${display.length}, 1fr)`;
+  display.forEach(word=>{
+    const el = document.createElement('div');
+    el.className = 'attn-word';
+    el.textContent = word;
+    el.style.background = 'rgba(160,90,255,0.08)';
+    el.style.borderColor = 'rgba(160,90,255,0.2)';
+    el.addEventListener('mouseenter',()=>highlightAttention(word));
+    el.addEventListener('mouseleave',()=>resetAttention());
+    grid.appendChild(el);
+  });
+}
+
+function highlightAttention(word) {
+  const cells = document.querySelectorAll('.attn-word');
+  const weights = attnWeights[word] || {};
+  cells.forEach(cell=>{
+    const w = weights[cell.textContent] || 0;
+    if(cell.textContent === word) {
+      cell.style.background='rgba(255,170,0,0.25)';
+      cell.style.color='var(--ember2)';
+      cell.style.borderColor='var(--ember2)';
+    } else if(w>0) {
+      const alpha = w*0.6;
+      cell.style.background=`rgba(160,90,255,${alpha})`;
+      cell.style.color='var(--text)';
+      cell.style.borderColor=`rgba(160,90,255,${w})`;
+    } else {
+      cell.style.background='rgba(255,255,255,0.03)';
+      cell.style.color='var(--muted)';
+      cell.style.borderColor='transparent';
+    }
+  });
+}
+
+function resetAttention() {
+  document.querySelectorAll('.attn-word').forEach(cell=>{
+    cell.style.background='rgba(160,90,255,0.08)';
+    cell.style.color='var(--text)';
+    cell.style.borderColor='rgba(160,90,255,0.2)';
+  });
+}
+
+buildAttnGrid();
+</script>
+</body>
+</html>
